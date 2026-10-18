@@ -59,6 +59,7 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
 
   // Feedback banner state after confirming
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
+  const [infoNotice, setInfoNotice] = useState<string | null>(null);
 
   // Synchronize location if global clinic changes
   useEffect(() => {
@@ -95,7 +96,7 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
         canConfirm: false,
         roleConfigured: true,
         overallStatus: 'blocked',
-        evaluatedAt: new Date().toISOString(),
+        evaluatedAt: DEMO_DATE + 'T10:00:00Z',
         staffId: '',
         staffName: '',
         actionType,
@@ -153,7 +154,7 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
       managerName: 'Sunita Menon (CarePoint Clinic Ops Manager)',
     });
 
-    alert(
+    setInfoNotice(
       `Blocked validation event recorded to simulated audit trail for ${currentStaff.name}. You can view it under the 'Validation Activity' tab.`
     );
   };
@@ -161,6 +162,7 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
   // Quick 1-Click Acceptance Test Presets
   const runAcceptanceTestPreset = (testNumber: number) => {
     setSuccessNotice(null);
+    setInfoNotice(null);
     switch (testNumber) {
       case 1: // Test 1: Valid nurse Ananya Deshmukh
         setSelectedStaffId('STF-101');
@@ -193,12 +195,12 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
         setShiftDate('2026-10-20');
         break;
       case 6: // Test 6: Changed selection (Ananya -> Rohan)
-        // Select Ananya first, then alert user to switch to Rohan
+        // Select Ananya first, then guide user to switch to Rohan
         setSelectedStaffId('STF-101');
         setActionType('schedule');
         setRequiredRole('Nurse');
-        alert(
-          'Test 6 Step 1: Selected valid nurse Ananya Deshmukh (Eligible). Now select Rohan Patil from the dropdown below to verify that the valid verdict immediately clears and blocks confirmation.'
+        setInfoNotice(
+          'Test 6 Step 1: Selected valid nurse Ananya Deshmukh (Eligible). Now select Rohan Patil from the dropdown or quick select below to verify that the valid verdict immediately clears and blocks confirmation without retaining stale state.'
         );
         break;
       case 7: // Test 7: Unverified credential Priya Nair
@@ -358,6 +360,26 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
             type="button"
             onClick={() => setSuccessNotice(null)}
             className="text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
+      {/* System Info Notification Alert */}
+      {infoNotice && (
+        <div className="p-4 bg-blue-50 border border-blue-300 rounded-xl text-blue-900 text-xs flex items-start justify-between gap-3 shadow-xs animate-in fade-in">
+          <div className="flex items-start gap-2.5">
+            <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-bold text-blue-950">System Notification</h4>
+              <p className="mt-0.5 leading-relaxed">{infoNotice}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setInfoNotice(null)}
+            className="text-blue-700 hover:text-blue-900 font-bold cursor-pointer"
           >
             &times;
           </button>

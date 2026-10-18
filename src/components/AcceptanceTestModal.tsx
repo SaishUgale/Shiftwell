@@ -95,13 +95,13 @@ export const ACCEPTANCE_TESTS: AcceptanceTestCase[] = [
   },
   {
     number: 8,
-    title: 'Test 8: Audit Trail Completeness',
-    candidate: 'All Simulated Events',
-    action: 'Audit Log Verification',
-    expectedResult: 'Passed',
-    details: 'Simulated activity log captures both successful confirmations and blocked attempts with timestamps, actor, and reasons.',
+    title: 'Test 8: Unconfigured Role (Dr. Rajesh)',
+    candidate: 'Dr. Rajesh Kumar (STF-106)',
+    action: 'Schedule Shift (General Physician)',
+    expectedResult: 'Blocked',
+    details: 'The system does not apply nurse-specific rules to a physician or default to eligible without configured requirements. Displays clear message that role requirements must be configured.',
     status: 'VERIFIED',
-    implementationNotes: 'Verifiable in Validation Activity tab. Maintains diagnostic visibility across all 40 CarePoint clinic locations.',
+    implementationNotes: 'Confirmation is disabled. Clear guidance directs clinic manager to configure role policy in Organization Settings before validating this role.',
   },
 ];
 

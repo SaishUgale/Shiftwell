@@ -17,6 +17,7 @@ export function App() {
   const [selectedStaffId, setSelectedStaffId] = useState<string>('STF-101');
   const [isCaseStudyOpen, setIsCaseStudyOpen] = useState<boolean>(false);
   const [isTestMatrixOpen, setIsTestMatrixOpen] = useState<boolean>(false);
+  const [toastNotice, setToastNotice] = useState<string | null>(null);
 
   // Update staff credential in local state (simulated edit)
   const handleUpdateStaffCredential = (
@@ -54,7 +55,7 @@ export function App() {
   // Reset staff data back to default mock data
   const handleResetStaffData = () => {
     setStaffList(INITIAL_STAFF);
-    alert('Mock staff records have been reset to default case study state.');
+    setToastNotice('Mock staff records have been reset to default case study state.');
   };
 
   // Add new event to activity audit trail
@@ -127,6 +128,21 @@ export function App() {
         onOpenTestMatrix={() => setIsTestMatrixOpen(true)}
         blockedCount={blockedCount}
       />
+ 
+      {toastNotice && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-xs flex items-center justify-between shadow-xs animate-in fade-in">
+            <span>{toastNotice}</span>
+            <button
+              type="button"
+              onClick={() => setToastNotice(null)}
+              className="text-blue-700 hover:text-blue-900 font-bold ml-4 cursor-pointer"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Workspace Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">

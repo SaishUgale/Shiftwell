@@ -31,7 +31,7 @@ export function parseDateString(dateStr: string): number {
 export function getDaysDifference(targetDateStr: string, baseDateStr = DEMO_DATE): number {
   const target = parseDateString(targetDateStr);
   const base = parseDateString(baseDateStr);
-  if (isNaN(target) || isNaN(base)) return 0;
+  if (isNaN(target) || isNaN(base)) return NaN;
   const diffTime = target - base;
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 }
@@ -51,6 +51,26 @@ export function validateShiftAssignment(
 
   // Rule: Check role configuration
   // For roles other than Nurse, do not invent requirements. Display a clear message that role requirements must be configured.
+  if (staff.role !== 'Nurse') {
+    return {
+      isValid: false,
+      canConfirm: false,
+      roleConfigured: false,
+      overallStatus: 'role_unconfigured',
+      evaluatedAt: nowIso,
+      staffId: staff.id,
+      staffName: staff.name,
+      actionType,
+      targetShift: shift,
+      checks: [],
+      failures: [
+        `Credential policy for role '${staff.role}' has not been configured in CarePoint organization settings.`,
+      ],
+      unconfiguredMessage: `Role requirements must be configured before role '${staff.role}' can be validated. Please configure mandatory credential policies in Organization Settings or assign a Nurse.`,
+      recommendedAction: `Contact the CarePoint clinical operations director to define mandatory credentials for '${staff.role}'.`,
+    };
+  }
+
   if (shift.requiredRole !== 'Nurse') {
     return {
       isValid: false,
@@ -68,26 +88,6 @@ export function validateShiftAssignment(
       ],
       unconfiguredMessage: `Role requirements must be configured before role '${shift.requiredRole}' can be validated. Please configure mandatory credential policies in Organization Settings or assign a Nurse.`,
       recommendedAction: `Contact the CarePoint clinical operations director to define mandatory credentials for '${shift.requiredRole}'.`,
-    };
-  }
-
-  // If staff role does not match shift role requirement
-  if (staff.role !== 'Nurse') {
-    return {
-      isValid: false,
-      canConfirm: false,
-      roleConfigured: true,
-      overallStatus: 'blocked',
-      evaluatedAt: nowIso,
-      staffId: staff.id,
-      staffName: staff.name,
-      actionType,
-      targetShift: shift,
-      checks: [],
-      failures: [
-        `Role mismatch: Target shift requires a Nurse, but ${staff.name} is registered as '${staff.role}'.`,
-      ],
-      recommendedAction: 'Select a staff member whose primary qualification matches the Nurse role.',
     };
   }
 
@@ -153,6 +153,21 @@ export function validateShiftAssignment(
 
     // Check expiry date against demo date (2026-10-18)
     const daysRemaining = getDaysDifference(credential.expiryDate, demoDate);
+
+    if (isNaN(daysRemaining)) {
+      checks.push({
+        credentialType: requirement.type,
+        credentialName: requirement.name,
+        required: true,
+        status: 'missing_expiry',
+        verificationStatus: credential.verificationStatus,
+        message: `${requirement.name} has an unparseable or invalid expiry date format (${credential.expiryDate}).`,
+      });
+      failures.push(
+        `${requirement.name} has an invalid expiry date format. Valid YYYY-MM-DD date required.`
+      );
+      continue;
+    }
 
     if (daysRemaining < 0) {
       // Expired!
@@ -250,7 +265,8 @@ export function getStaffOverallEligibility(
       hasUnverified = true;
       continue;
     }
-    if (!cred.expiryDate || getDaysDifference(cred.expiryDate, demoDate) < 0) {
+    const daysDiff = cred.expiryDate ? getDaysDifference(cred.expiryDate, demoDate) : NaN;
+    if (!cred.expiryDate || isNaN(daysDiff) || daysDiff < 0) {
       hasExpired = true;
       continue;
     }

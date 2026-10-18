@@ -143,7 +143,7 @@ export const Overview: FC<OverviewProps> = ({
             <span className="text-xs text-red-600">staff members non-compliant</span>
           </div>
           <div className="mt-2 text-xs text-red-700 font-medium flex items-center gap-1">
-            <span>Rohan (BLS), Meera (Reg), Kavya (Missing)</span>
+            <span>Rohan (BLS), Meera (Reg), Kavya (Missing){unverifiedCount > 0 ? ` • ${unverifiedCount} Unverified (Priya)` : ''}</span>
           </div>
         </div>
 
