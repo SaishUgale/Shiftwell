@@ -201,14 +201,15 @@ describe('Shiftwell Credential Validation Engine', () => {
       expect(getDaysDifference('2026-09-30', '2026-10-18')).toBe(-18);
     });
 
-    it('treats credentials expiring ON the exact demo date as valid (0 days remaining)', () => {
+    it('treats credentials expiring ON the exact shift date as valid (0 days remaining)', () => {
       const days = getDaysDifference('2026-10-18', '2026-10-18');
       expect(days).toBe(0);
 
       const staff = getStaff('STF-101');
-      // Set BLS expiry exactly to demo date
+      // Set BLS expiry exactly to demo/shift date
       staff.credentials[0].expiryDate = '2026-10-18';
-      const result = validateShiftAssignment(staff, defaultNurseShift, 'schedule', '2026-10-18');
+      const shiftOnDemoDate: ShiftDetails = { ...defaultNurseShift, date: '2026-10-18' };
+      const result = validateShiftAssignment(staff, shiftOnDemoDate, 'schedule', '2026-10-18');
 
       const blsCheck = result.checks.find((c) => c.credentialType === 'BLS');
       expect(blsCheck?.status).toBe('passed');
@@ -225,6 +226,68 @@ describe('Shiftwell Credential Validation Engine', () => {
       expect(result.canConfirm).toBe(false);
       const blsCheck = result.checks.find((c) => c.credentialType === 'BLS');
       expect(blsCheck?.status).toBe('missing_expiry');
+    });
+  });
+
+  describe('Shift-Date-Aware Validation (Required Regression Scenarios)', () => {
+    it('blocks assignment when credential expires before target shift date even if valid on demo date', () => {
+      const staff = getStaff('STF-101');
+      // BLS expires on 2026-10-19 (+1 day after demo date 2026-10-18, but 1 day before shift on 2026-10-20)
+      staff.credentials[0].expiryDate = '2026-10-19';
+      const result = validateShiftAssignment(staff, defaultNurseShift, 'schedule', '2026-10-18');
+
+      expect(result.isValid).toBe(false);
+      expect(result.canConfirm).toBe(false);
+      expect(result.overallStatus).toBe('blocked');
+      const blsCheck = result.checks.find((c) => c.credentialType === 'BLS');
+      expect(blsCheck?.status).toBe('expired');
+      expect(blsCheck?.message).toContain('before target shift date (2026-10-20)');
+      expect(result.failures.some((f) => f.includes('expires on 2026-10-19 prior to target shift on 2026-10-20'))).toBe(true);
+    });
+
+    it('allows assignment when credential remains valid throughout the target shift date', () => {
+      const staff = getStaff('STF-101');
+      // BLS expires on 2026-10-20 (exact day of target shift)
+      staff.credentials[0].expiryDate = '2026-10-20';
+      const result = validateShiftAssignment(staff, defaultNurseShift, 'schedule', '2026-10-18');
+
+      expect(result.isValid).toBe(true);
+      expect(result.canConfirm).toBe(true);
+      expect(result.overallStatus).toBe('eligible');
+      const blsCheck = result.checks.find((c) => c.credentialType === 'BLS');
+      expect(blsCheck?.status).toBe('passed');
+      expect(blsCheck?.message).toContain('Active throughout target shift on 2026-10-20');
+    });
+
+    it('enforces identical shift-date-aware validation rules on shift swap approvals', () => {
+      const staff = getStaff('STF-101');
+      // BLS expires before shift date on a swap approval
+      staff.credentials[0].expiryDate = '2026-10-19';
+      const swapResult = validateShiftAssignment(staff, defaultNurseShift, 'swap', '2026-10-18');
+
+      expect(swapResult.isValid).toBe(false);
+      expect(swapResult.canConfirm).toBe(false);
+      expect(swapResult.overallStatus).toBe('blocked');
+      expect(swapResult.actionType).toBe('swap');
+      expect(swapResult.failures[0]).toContain('shift swap approval');
+    });
+
+    it('recalculates validation when the target shift date is changed', () => {
+      const staff = getStaff('STF-101');
+      staff.credentials[0].expiryDate = '2026-10-19';
+
+      // For a shift on 2026-10-18, credential is valid through shift date
+      const shiftToday: ShiftDetails = { ...defaultNurseShift, date: '2026-10-18' };
+      const validToday = validateShiftAssignment(staff, shiftToday, 'schedule', '2026-10-18');
+      expect(validToday.isValid).toBe(true);
+      expect(validToday.canConfirm).toBe(true);
+
+      // Change shift date to 2026-10-20: credential expires before shift, immediately blocked
+      const shiftFuture: ShiftDetails = { ...defaultNurseShift, date: '2026-10-20' };
+      const invalidFuture = validateShiftAssignment(staff, shiftFuture, 'schedule', '2026-10-18');
+      expect(invalidFuture.isValid).toBe(false);
+      expect(invalidFuture.canConfirm).toBe(false);
+      expect(invalidFuture.overallStatus).toBe('blocked');
     });
   });
 

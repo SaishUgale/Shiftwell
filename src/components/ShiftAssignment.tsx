@@ -732,8 +732,8 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
                 </h4>
 
                 {validationResult.checks.length === 0 ? (
-                  <div className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    No credential rules configured for role '{requiredRole}'. Validation cannot proceed.
+                  <div className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    No credential rules configured for role '{currentStaff?.role !== 'Nurse' ? currentStaff?.role : requiredRole}'. Validation cannot proceed.
                   </div>
                 ) : (
                   validationResult.checks.map((check) => {

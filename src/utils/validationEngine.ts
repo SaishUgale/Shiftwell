@@ -151,10 +151,12 @@ export function validateShiftAssignment(
       continue;
     }
 
-    // Check expiry date against demo date (2026-10-18)
-    const daysRemaining = getDaysDifference(credential.expiryDate, demoDate);
+    // Check expiry date against demo date and target shift date
+    const targetShiftDate = shift?.date || demoDate;
+    const daysRemainingFromDemo = getDaysDifference(credential.expiryDate, demoDate);
+    const daysRemainingUntilShift = getDaysDifference(credential.expiryDate, targetShiftDate);
 
-    if (isNaN(daysRemaining)) {
+    if (isNaN(daysRemainingFromDemo) || isNaN(daysRemainingUntilShift)) {
       checks.push({
         credentialType: requirement.type,
         credentialName: requirement.name,
@@ -169,33 +171,49 @@ export function validateShiftAssignment(
       continue;
     }
 
-    if (daysRemaining < 0) {
-      // Expired!
-      const daysAgo = Math.abs(daysRemaining);
+    if (daysRemainingFromDemo < 0) {
+      // Expired relative to demo date!
+      const daysAgo = Math.abs(daysRemainingFromDemo);
       checks.push({
         credentialType: requirement.type,
         credentialName: requirement.name,
         required: true,
         status: 'expired',
         expiryDate: credential.expiryDate,
-        daysRemaining,
+        daysRemaining: daysRemainingFromDemo,
         verificationStatus: credential.verificationStatus,
         message: `${requirement.name} expired on ${credential.expiryDate} (${daysAgo} day${daysAgo === 1 ? '' : 's'} ago as of ${demoDate}).`,
       });
       failures.push(
         `${requirement.name} expired on ${credential.expiryDate}. Expired credentials block ${actionLabel}.`
       );
+    } else if (daysRemainingUntilShift < 0) {
+      // Valid on demo date, but expires before the target shift date!
+      const daysPrior = Math.abs(daysRemainingUntilShift);
+      checks.push({
+        credentialType: requirement.type,
+        credentialName: requirement.name,
+        required: true,
+        status: 'expired',
+        expiryDate: credential.expiryDate,
+        daysRemaining: daysRemainingUntilShift,
+        verificationStatus: credential.verificationStatus,
+        message: `${requirement.name} expires on ${credential.expiryDate}, before target shift date (${targetShiftDate}) by ${daysPrior} day${daysPrior === 1 ? '' : 's'}. Credentials must remain valid throughout the target shift.`,
+      });
+      failures.push(
+        `${requirement.name} expires on ${credential.expiryDate} prior to target shift on ${targetShiftDate}. Credentials must remain valid throughout the target shift and block ${actionLabel}.`
+      );
     } else {
-      // Valid!
+      // Valid throughout target shift!
       checks.push({
         credentialType: requirement.type,
         credentialName: requirement.name,
         required: true,
         status: 'passed',
         expiryDate: credential.expiryDate,
-        daysRemaining,
+        daysRemaining: daysRemainingFromDemo,
         verificationStatus: credential.verificationStatus,
-        message: `Valid through ${credential.expiryDate} (${daysRemaining} days remaining). Verified.`,
+        message: `Valid through ${credential.expiryDate} (${daysRemainingFromDemo} days remaining). Active throughout target shift on ${targetShiftDate}. Verified.`,
       });
     }
   }
@@ -204,7 +222,7 @@ export function validateShiftAssignment(
 
   let recommendedAction: string | undefined;
   if (!isValid) {
-    if (failures.some((f) => f.includes('expired'))) {
+    if (failures.some((f) => f.includes('expired') || f.includes('expires'))) {
       recommendedAction =
         'Request an updated renewal certificate from the staff member. Upload the renewed credential in Staff & Credentials before re-attempting assignment.';
     } else if (failures.some((f) => f.includes('missing'))) {
