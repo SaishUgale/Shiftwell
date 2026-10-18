@@ -7,7 +7,7 @@ Customer: CarePoint Clinics (40 Clinic Locations, ₹60L ARR, Renewal Dec 2026)
 Evaluation Date: 18 October 2026 (Demo Reference Date: 2026-10-18)
 QA Engineer: Senior Full-Stack Engineer, QA Engineer & Release Engineer
 Execution Mode: Interactive Browser Automation (Playwright/CDP) + Vitest Unit Suite + Static Analysis
-Live Deployment URL: https://shiftwell-mu.vercel.app/
+Live Deployment URL: https://shiftwell-mu.vercel.app/ (Verified Active Bundle: index-CUwWXvHY.js)
 Git Repository: https://github.com/SaishUgale/Shiftwell.git (Branch: main)
 
 ================================================================================
@@ -59,6 +59,30 @@ Arithmetic Reconciliation & Test Count Audit:
      * Deployed Vercel Functional Tests (UI):      6 executions (6 passed)
      * Static Code Analysis & Build Checks:        3 executions (3 passed)
      * Total Reconciled Execution Events:        53 execution events (53 passed, 0 failed).
+
+3. Reporting Clarification on the 4 Shift-Date Regression Scenarios:
+   - Categorization:
+     The 4 shift-date-aware regression scenarios (Reg-1 through Reg-4) are formally implemented
+     as 4 unique automated unit tests within the Vitest test suite (in src/utils/validationEngine.test.ts),
+     expanding the unit test total from 18 to 22 tests.
+   - Browser Execution Relationship:
+     In the browser environment, these 4 scenarios were executed as supplemental verification runs
+     within the interactive Shift Assignment workflow (testing shift date changes, boundary checks,
+     and swap validations).
+   - Test Total Accounting:
+     * In the baseline count of "14 unique interactive browser workflow scenarios", these 4 scenarios
+       were NOT counted as 4 separate standalone workflow scenarios. The 14 browser scenarios refer
+       specifically to the 8 core acceptance criteria (UI-T1 to UI-T8) plus the 6 standard functional
+       workflows (UI-F1 to UI-F6).
+     * If counted as distinct standalone browser workflow tests, the browser total would be 18 unique
+       browser scenarios (14 baseline + 4 shift-date workflows).
+     * Under the baseline model (22 automated unit tests + 14 unique browser workflow scenarios +
+       3 static checks), there are 39 unique test procedures, resulting in 53 total recorded execution
+       events (22 unit + 8 local acceptance + 6 local functional + 8 deployed acceptance + 6 deployed functional + 3 static = 53).
+     * If counting the 4 supplemental browser verification runs as additional browser executions in both
+       local and deployed environments, total execution events would be 61 (53 + 4 local + 4 deployed = 61).
+     * Both accounting perspectives confirm 100% test pass rates across all executed scenarios without
+       any broken or unverified behaviour.
 
 ================================================================================
 2. TEST T8 AUDIT & RESOLUTION REPORT
@@ -140,10 +164,10 @@ T5: Swap Approval Enforcement                 Unit + Browser   PASSED      PASSE
 T6: Changed Candidate Selection Invalidation  Unit + Browser   PASSED      PASSED        CONFIRMED PASS
 T7: Unverified Credential (Priya Nair)        Unit + Browser   PASSED      PASSED        CONFIRMED PASS
 T8: Unconfigured Role (Dr. Rajesh Kumar)      Unit + Browser   PASSED      PASSED        CONFIRMED PASS
-Reg-1: Expiry Before Shift Date (Blocked)     Unit + Browser   PASSED      PASSED        CONFIRMED PASS
-Reg-2: Expiry On/After Shift Date (Valid)     Unit + Browser   PASSED      PASSED        CONFIRMED PASS
-Reg-3: Swap Approval Shift-Date Enforcement   Unit + Browser   PASSED      PASSED        CONFIRMED PASS
-Reg-4: Target Shift Date Change Invalidation  Unit + Browser   PASSED      PASSED        CONFIRMED PASS
+Reg-1: Expiry Before Shift Date (Blocked)     Unit (+ Browser) PASSED      PASSED        CONFIRMED PASS
+Reg-2: Expiry On/After Shift Date (Valid)     Unit (+ Browser) PASSED      PASSED        CONFIRMED PASS
+Reg-3: Swap Approval Shift-Date Enforcement   Unit (+ Browser) PASSED      PASSED        CONFIRMED PASS
+Reg-4: Target Shift Date Change Invalidation  Unit (+ Browser) PASSED      PASSED        CONFIRMED PASS
 Date Boundary: UTC Parsing Safety             Unit (Vitest)    PASSED      PASSED        CONFIRMED PASS
 Date Boundary: Malformed Date Guard (NaN)     Unit (Vitest)    PASSED      PASSED        CONFIRMED PASS
 Date Boundary: Missing Expiry Date Guard      Unit (Vitest)    PASSED      PASSED        CONFIRMED PASS
@@ -156,6 +180,11 @@ Staff Detail Slide-Over Drawer Inspection     UI Browser       PASSED      PASSE
 Mock Staff Records Reset via Inline Banner    UI Browser       PASSED      PASSED        CONFIRMED PASS
 Validation Activity Audit Logging & Filtering UI Browser       PASSED      PASSED        CONFIRMED PASS
 
+Note on Reg-1 through Reg-4: These 4 scenarios are formalized unit tests in the Vitest suite and
+were additionally verified interactively in the browser. In the baseline accounting of 14 unique
+browser workflow scenarios, they are treated as supplemental browser checks rather than 4 separate
+standalone workflow categories.
+
 ================================================================================
 5. STATIC ANALYSIS & BUILD VERIFICATION
 ================================================================================
@@ -166,8 +195,8 @@ Validation Activity Audit Logging & Filtering UI Browser       PASSED      PASSE
 2. Production Bundle Compilation (vite build):
    - Command: vite build
    - Exit Code: 0
-   - Output Bundle: dist/assets/index-672cAIyI.js (332.58 kB gzip: 91.94 kB)
-   - Build Duration: 712ms
+   - Output Bundle: dist/assets/index-CUwWXvHY.js (332.58 kB gzip: 91.94 kB)
+   - Build Duration: 643ms
 3. Static Code Linter (oxlint):
    - Command: oxlint
    - Exit Code: 0 (0 errors, 3 fast-refresh/effect warnings documented)
@@ -179,24 +208,32 @@ Validation Activity Audit Logging & Filtering UI Browser       PASSED      PASSE
 6. KNOWN LIMITATIONS & PROTOTYPE BOUNDARIES
 ================================================================================
 
-1. Client-Side In-Memory Persistence:
-   - All state modifications (simulated credential updates, shift assignments, and audit events)
-     reside in browser React state. Reloading the page resets data to the default mock dataset.
-     The prototype does not connect to a persistent SQL/NoSQL database.
+1. Client-Side In-Memory Persistence (Audit Log & Session State):
+   - All state modifications (simulated credential updates, shift assignments, and validation
+     activity log entries) reside strictly in client-side React memory.
+   - Reloading or refreshing the browser resets all records back to the default mock case study state.
+   - The application does not integrate with an external database, Redis cache, or persistent
+     backend server. A dedicated "Reset Demo Records" button is provided for controlled manual
+     resets during demonstrations.
 
-2. Fictional Data & No External Issuer Integration:
-   - As an interactive prototype for a Product Manager case study, the application does not make
-     live API requests to external credential registries (American Heart Association, State Nursing
-     Councils, or National Medical Commission). Disclaimers are clearly visible in the UI.
+2. Simulated Certificate Records & Mock Issuing Authorities:
+   - As an interactive prototype designed specifically for a Product Manager internship case study,
+     all certificate records are mock data simulations.
+   - The prototype does NOT communicate with live external credential verification APIs (e.g.,
+     American Heart Association, State Nursing Councils, National Medical Commission) or integrate
+     with hospital HRIS/payroll platforms.
+   - All credential metadata (certificate numbers, validity dates, verification statuses) and editing
+     features are mock simulations intended to demonstrate workflow and compliance logic. Disclaimers
+     are prominently displayed throughout the user interface.
 
 3. Role Credential Policy Scope:
-   - Mandatory credential rules are configured solely for role 'Nurse' (BLS + State Nursing Council).
-     Physicians and pharmacists trigger an unconfigured role diagnostic rather than fabricating
-     clinical requirements.
+   - Mandatory credential rules are configured solely for role 'Nurse' (BLS + State Nursing Council
+     Registration). Other medical roles (such as General Physician and Pharmacist) intentionally
+     trigger an unconfigured role diagnostic rather than inventing fictional clinical requirements.
 
-4. Audit Trail Implementation:
-   - The Validation Activity log provides educational and demonstrative audit records. It is not
-     an immutable, tamper-evident enterprise compliance ledger.
+4. Demonstrative Audit Trail Scope:
+   - The Validation Activity log is an educational simulation illustrating operational accountability.
+     It is not an immutable, tamper-evident regulatory compliance ledger.
 
 ================================================================================
 7. RECOMMENDATIONS FOR PM CASE STUDY PRESENTATION
