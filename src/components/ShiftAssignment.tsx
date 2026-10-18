@@ -392,16 +392,16 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
         <div className="lg:col-span-7 space-y-5">
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
             <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">
+              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold shrink-0">
                 1
               </span>
               Step 1: Select Operational Action
             </h2>
-            <p className="text-xs text-slate-500 mt-1 ml-8">
+            <p className="text-xs text-slate-500 mt-1 ml-0 sm:ml-8">
               Choose whether you are scheduling an open shift or approving a staff shift swap request.
             </p>
 
-            <div className="mt-3 ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="mt-3 ml-0 sm:ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label
                 className={`p-3 rounded-lg border flex items-start gap-3 cursor-pointer transition-all ${
                   actionType === 'schedule'
@@ -454,7 +454,7 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
 
             {/* Realistic Swap Details Notice */}
             {actionType === 'swap' && (
-              <div className="mt-3 ml-8 p-3 bg-amber-50/70 border border-amber-200 rounded-lg text-xs text-amber-900">
+              <div className="mt-3 ml-0 sm:ml-8 p-3 bg-amber-50/70 border border-amber-200 rounded-lg text-xs text-amber-900">
                 <div className="font-semibold flex items-center gap-1 text-amber-950">
                   <Info className="w-3.5 h-3.5 text-amber-700" />
                   Swap Request Context:
@@ -472,16 +472,16 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
           {/* Step 2: Select Staff Member */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
             <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">
+              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold shrink-0">
                 2
               </span>
               Step 2: Select Candidate Staff Member
             </h2>
-            <p className="text-xs text-slate-500 mt-1 ml-8">
+            <p className="text-xs text-slate-500 mt-1 ml-0 sm:ml-8">
               Select the employee being scheduled or proposed as the swap replacement.
             </p>
 
-            <div className="mt-3 ml-8 space-y-3">
+            <div className="mt-3 ml-0 sm:ml-8 space-y-3">
               <div>
                 <label htmlFor="staff-candidate-select" className="block text-xs font-semibold text-slate-700 mb-1">
                   Staff Member:
@@ -563,16 +563,16 @@ export const ShiftAssignment: FC<ShiftAssignmentProps> = ({
           {/* Step 3: Select Target Shift */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
             <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">
+              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold shrink-0">
                 3
               </span>
               Step 3: Select Target Shift Parameters
             </h2>
-            <p className="text-xs text-slate-500 mt-1 ml-8">
+            <p className="text-xs text-slate-500 mt-1 ml-0 sm:ml-8">
               Define the shift date, operating hours, clinic facility, and required role.
             </p>
 
-            <div className="mt-3 ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="mt-3 ml-0 sm:ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <label htmlFor="shift-date-input" className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" /> Shift Date:

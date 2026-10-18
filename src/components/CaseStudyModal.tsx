@@ -24,7 +24,7 @@ export const CaseStudyModal: FC<CaseStudyModalProps> = ({ isOpen, onClose }) => 
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="p-6 bg-slate-900 text-white rounded-t-2xl flex items-start justify-between">
+        <div className="p-4 sm:p-6 bg-slate-900 text-white rounded-t-2xl flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500 text-white uppercase tracking-wider">
@@ -32,7 +32,7 @@ export const CaseStudyModal: FC<CaseStudyModalProps> = ({ isOpen, onClose }) => 
               </span>
               <span className="text-xs text-slate-400">Shiftwell B2B SaaS</span>
             </div>
-            <h2 className="text-xl font-bold mt-1 tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold mt-1 tracking-tight">
               CarePoint Clinics: Shiftwell Certificate Validation
             </h2>
             <p className="text-xs text-slate-300 mt-0.5">
@@ -42,14 +42,14 @@ export const CaseStudyModal: FC<CaseStudyModalProps> = ({ isOpen, onClose }) => 
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6 text-xs text-slate-700">
+        <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 text-xs text-slate-700">
           {/* Key Business Facts Grid */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
@@ -148,14 +148,14 @@ export const CaseStudyModal: FC<CaseStudyModalProps> = ({ isOpen, onClose }) => 
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex items-center justify-between">
-          <span className="text-[11px] text-slate-500">
+        <div className="p-3.5 sm:p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-2.5">
+          <span className="text-[11px] text-slate-500 text-center sm:text-left">
             Shiftwell Case Study &bull; CarePoint Clinics Account
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-lg transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-lg transition-colors cursor-pointer text-center"
           >
             Close Summary
           </button>

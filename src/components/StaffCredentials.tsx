@@ -261,9 +261,10 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
         </div>
       </div>
 
-      {/* Main Staff Roster Table */}
+      {/* Main Staff Roster: Table for Tablets/Desktop, Responsive Card Stack for Mobile */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
@@ -412,6 +413,139 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Responsive Card Stack View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {filteredStaff.length === 0 ? (
+            <div className="py-8 text-center text-slate-400 text-xs">
+              No staff records match the current filter or search criteria.
+            </div>
+          ) : (
+            filteredStaff.map((staff) => {
+              const { summaryLabel, badgeClass } = getStaffOverallEligibility(staff);
+              const bls = staff.credentials.find((c) => c.type === 'BLS');
+              const reg = staff.credentials.find((c) => c.type === 'NURSING_COUNCIL');
+
+              return (
+                <div
+                  key={staff.id}
+                  className="p-3.5 space-y-3 hover:bg-slate-50/70 transition-colors cursor-pointer"
+                  onClick={() => setSelectedStaff(staff)}
+                >
+                  {/* Card Header: Avatar, Name, Clinic, Status */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-full ${staff.avatarBg} text-white font-semibold flex items-center justify-center shrink-0 text-xs shadow-xs`}>
+                        {staff.name.split(' ').map((n) => n[0]).join('')}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-slate-900 text-xs">
+                          {staff.name}
+                        </div>
+                        <div className="text-[11px] text-slate-500 font-mono">
+                          {staff.role} &bull; {staff.primaryClinic.replace('CarePoint - ', '')}
+                        </div>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badgeClass} shrink-0`}>
+                      {summaryLabel}
+                    </span>
+                  </div>
+
+                  {/* Credentials breakdown */}
+                  {staff.role === 'Nurse' ? (
+                    <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
+                      {/* BLS */}
+                      <div>
+                        <div className="text-[10px] uppercase font-semibold text-slate-400">BLS Cert</div>
+                        {!bls ? (
+                          <span className="inline-flex items-center gap-1 text-red-600 font-semibold mt-0.5">
+                            <AlertTriangle className="w-3 h-3" /> Missing
+                          </span>
+                        ) : bls.verificationStatus !== 'verified' ? (
+                          <div>
+                            <span className="inline-flex items-center gap-1 text-amber-700 font-medium mt-0.5">
+                              <Clock className="w-3 h-3" /> Unverified
+                            </span>
+                            <div className="text-[10px] text-slate-400 font-mono">Exp: {bls.expiryDate}</div>
+                          </div>
+                        ) : bls.expiryDate && bls.expiryDate < DEMO_DATE ? (
+                          <div>
+                            <span className="inline-flex items-center gap-1 text-red-600 font-medium mt-0.5">
+                              <ShieldAlert className="w-3 h-3" /> Expired
+                            </span>
+                            <div className="text-[10px] text-red-500 font-mono">Exp: {bls.expiryDate}</div>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="inline-flex items-center gap-1 text-emerald-700 font-medium mt-0.5">
+                              <CheckCircle2 className="w-3 h-3" /> Valid
+                            </span>
+                            <div className="text-[10px] text-slate-400 font-mono">Exp: {bls.expiryDate}</div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Nursing Council Reg */}
+                      <div>
+                        <div className="text-[10px] uppercase font-semibold text-slate-400">Council Reg</div>
+                        {!reg ? (
+                          <span className="inline-flex items-center gap-1 text-red-600 font-semibold mt-0.5">
+                            <AlertTriangle className="w-3 h-3" /> Missing
+                          </span>
+                        ) : reg.verificationStatus !== 'verified' ? (
+                          <div>
+                            <span className="inline-flex items-center gap-1 text-amber-700 font-medium mt-0.5">
+                              <Clock className="w-3 h-3" /> Unverified
+                            </span>
+                            <div className="text-[10px] text-slate-400 font-mono">Exp: {reg.expiryDate}</div>
+                          </div>
+                        ) : reg.expiryDate && reg.expiryDate < DEMO_DATE ? (
+                          <div>
+                            <span className="inline-flex items-center gap-1 text-red-600 font-medium mt-0.5">
+                              <ShieldAlert className="w-3 h-3" /> Expired
+                            </span>
+                            <div className="text-[10px] text-red-500 font-mono">Exp: {reg.expiryDate}</div>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="inline-flex items-center gap-1 text-emerald-700 font-medium mt-0.5">
+                              <CheckCircle2 className="w-3 h-3" /> Valid
+                            </span>
+                            <div className="text-[10px] text-slate-400 font-mono">Exp: {reg.expiryDate}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-slate-400 italic bg-slate-50 p-2 rounded-lg border border-slate-200/60">
+                      Mandatory credential rules not configured for role '{staff.role}'
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 pt-0.5" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedStaff(staff)}
+                      className="flex-1 py-1.5 px-3 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 text-center transition-colors cursor-pointer"
+                    >
+                      Details &amp; Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onAssignShiftForStaff(staff.id)}
+                      className="flex-1 py-1.5 px-3 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-center transition-colors cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      Assign Shift
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* Staff Credential Detail & Edit Slide-over Drawer */}
@@ -419,14 +553,14 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
         <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/60 backdrop-blur-xs flex justify-end">
           <div className="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-200">
             {/* Drawer Header */}
-            <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between">
+            <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between gap-2">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full ${activeStaff.avatarBg} text-white font-bold text-sm flex items-center justify-center shadow-xs`}>
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full ${activeStaff.avatarBg} text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0`}>
                   {activeStaff.name.split(' ').map((n) => n[0]).join('')}
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">{activeStaff.name}</h2>
-                  <div className="text-xs text-slate-500 flex items-center gap-2">
+                  <h2 className="text-sm sm:text-base font-bold text-slate-900">{activeStaff.name}</h2>
+                  <div className="text-[11px] sm:text-xs text-slate-500 flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span className="font-medium text-slate-700">{activeStaff.role}</span>
                     <span>&bull;</span>
                     <span>{activeStaff.id}</span>
@@ -442,7 +576,7 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
                   setEditingCred(null);
                   setShowAddBlsModal(false);
                 }}
-                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer shrink-0"
                 title="Close drawer"
               >
                 <X className="w-5 h-5" />
@@ -458,7 +592,7 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
             </div>
 
             {/* Drawer Body: Credentials List */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Registered Professional Credentials ({activeStaff.credentials.length})
@@ -737,8 +871,8 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-              <span className="text-[11px] text-slate-500">
+            <div className="p-3.5 sm:p-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+              <span className="text-[11px] text-slate-500 text-center sm:text-left">
                 CarePoint Clinics Roster &bull; Staff ID: {activeStaff.id}
               </span>
               <button
@@ -747,7 +881,7 @@ export const StaffCredentials: FC<StaffCredentialsProps> = ({
                   onAssignShiftForStaff(activeStaff.id);
                   setSelectedStaff(null);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4" />
                 Assign Shift with Validation

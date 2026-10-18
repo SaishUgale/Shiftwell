@@ -83,11 +83,11 @@ export const ValidationActivity: FC<ValidationActivityProps> = ({
             />
           </div>
 
-          <div className="flex items-center gap-1.5" aria-label="Outcome Filter Tabs">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0" aria-label="Outcome Filter Tabs">
             <button
               type="button"
               onClick={() => setFilterOutcome('all')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer shrink-0 ${
                 filterOutcome === 'all'
                   ? 'bg-slate-900 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -98,7 +98,7 @@ export const ValidationActivity: FC<ValidationActivityProps> = ({
             <button
               type="button"
               onClick={() => setFilterOutcome('Approved')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer shrink-0 ${
                 filterOutcome === 'Approved'
                   ? 'bg-emerald-700 text-white'
                   : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
@@ -109,7 +109,7 @@ export const ValidationActivity: FC<ValidationActivityProps> = ({
             <button
               type="button"
               onClick={() => setFilterOutcome('Blocked')}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer shrink-0 ${
                 filterOutcome === 'Blocked'
                   ? 'bg-red-700 text-white'
                   : 'bg-red-50 text-red-700 hover:bg-red-100'
@@ -121,9 +121,10 @@ export const ValidationActivity: FC<ValidationActivityProps> = ({
         </div>
       </div>
 
-      {/* Audit Log Table */}
+      {/* Audit Log Table: Desktop Table + Mobile Responsive Cards */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
@@ -227,6 +228,89 @@ export const ValidationActivity: FC<ValidationActivityProps> = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Responsive Card Stack */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {filteredLogs.length === 0 ? (
+            <div className="py-10 text-center text-slate-400 text-xs">
+              No validation events match the selected criteria.
+            </div>
+          ) : (
+            filteredLogs.map((log) => {
+              const isApproved = log.outcome === 'Approved';
+
+              return (
+                <div
+                  key={log.id}
+                  className={`p-3.5 space-y-2.5 transition-colors ${
+                    !isApproved ? 'bg-red-50/20' : ''
+                  }`}
+                >
+                  {/* Card Header: Staff & Outcome */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-semibold text-slate-900 text-xs">{log.staffName}</div>
+                      <div className="text-[11px] text-slate-500 font-mono">{log.staffRole} &bull; {log.staffId}</div>
+                    </div>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border shrink-0 ${
+                      isApproved
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                        : 'bg-red-50 text-red-700 border-red-300'
+                    }`}>
+                      {isApproved ? (
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      ) : (
+                        <ShieldAlert className="w-3 h-3 text-red-600" />
+                      )}
+                      {log.outcome}
+                    </span>
+                  </div>
+
+                  {/* Action & Shift Details */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+                    <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold border ${
+                      log.actionType === 'swap'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                        : 'bg-blue-50 text-blue-800 border-blue-200'
+                    }`}>
+                      {log.actionType === 'swap' ? 'Swap Approval' : 'Shift Schedule'}
+                    </span>
+                    <span className="text-slate-700 flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-slate-400" />
+                      {log.targetShiftDate} ({log.targetShiftTime})
+                    </span>
+                    <span className="text-slate-500 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-slate-400" />
+                      {log.clinicLocation.replace('CarePoint - ', '')}
+                    </span>
+                  </div>
+
+                  {/* Diagnostic details */}
+                  {isApproved ? (
+                    <div className="text-slate-600 text-[11px] bg-slate-50 p-2 rounded border border-slate-100">
+                      All mandatory credentials verified and active. Assignment confirmed by {log.managerName}.
+                    </div>
+                  ) : (
+                    <div className="p-2 rounded bg-red-100/60 border border-red-200 space-y-0.5 text-[11px]">
+                      <div className="text-red-800 font-semibold">
+                        {log.failedCredential || 'Credential Verification Failed'}
+                      </div>
+                      <div className="text-red-700 leading-relaxed">
+                        {log.failureReason}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Timestamp & ID */}
+                  <div className="text-[10px] text-slate-400 font-mono flex items-center justify-between pt-1 border-t border-slate-100">
+                    <span>{log.formattedTime}</span>
+                    <span>ID: {log.id}</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

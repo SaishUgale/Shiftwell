@@ -116,7 +116,7 @@ export const AcceptanceTestModal: FC<AcceptanceTestModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="p-6 bg-slate-900 text-white rounded-t-2xl flex items-start justify-between">
+        <div className="p-4 sm:p-6 bg-slate-900 text-white rounded-t-2xl flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white uppercase tracking-wider">
@@ -124,7 +124,7 @@ export const AcceptanceTestModal: FC<AcceptanceTestModalProps> = ({
               </span>
               <span className="text-xs text-slate-400">8 / 8 Scenarios Passed</span>
             </div>
-            <h2 className="text-xl font-bold mt-1 tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold mt-1 tracking-tight">
               Shiftwell Credential Validation Acceptance Criteria
             </h2>
             <p className="text-xs text-slate-300 mt-0.5">
@@ -134,22 +134,22 @@ export const AcceptanceTestModal: FC<AcceptanceTestModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 text-xs flex items-center justify-between">
+        <div className="p-4 sm:p-6 space-y-4">
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-blue-700 shrink-0" />
               <span>
                 Click <strong>"Run Scenario"</strong> on any test below to automatically load the parameters into the Shift Assignment workflow.
               </span>
             </div>
-            <span className="font-bold text-[11px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+            <span className="font-bold text-[11px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded self-start sm:self-auto shrink-0">
               Demo Date: 18 Oct 2026
             </span>
           </div>
@@ -158,10 +158,10 @@ export const AcceptanceTestModal: FC<AcceptanceTestModalProps> = ({
             {ACCEPTANCE_TESTS.map((test) => (
               <div
                 key={test.number}
-                className="p-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="p-3.5 sm:p-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4"
               >
                 <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span className="font-bold text-slate-900 text-xs">{test.title}</span>
                     <span
                       className={`px-2 py-0.2 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -196,14 +196,14 @@ export const AcceptanceTestModal: FC<AcceptanceTestModalProps> = ({
                   </div>
                 </div>
 
-                <div className="self-end md:self-center shrink-0">
+                <div className="w-full sm:w-auto shrink-0 pt-1 sm:pt-0">
                   <button
                     type="button"
                     onClick={() => {
                       onRunTest(test.number);
                       onClose();
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors shadow-xs cursor-pointer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors shadow-xs cursor-pointer"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
                     Run Scenario
@@ -215,14 +215,14 @@ export const AcceptanceTestModal: FC<AcceptanceTestModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex items-center justify-between">
-          <span className="text-[11px] text-slate-500">
+        <div className="p-3.5 sm:p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-2.5">
+          <span className="text-[11px] text-slate-500 text-center sm:text-left">
             CarePoint Clinics Prototype &bull; Shiftwell Core Validation Engine
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-lg transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-lg transition-colors cursor-pointer text-center"
           >
             Close Matrix
           </button>
